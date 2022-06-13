@@ -1,4 +1,4 @@
-from asyncore import file_dispatcher
+import requests
 import logging
 
 logger = logging.getLogger(__name__)
