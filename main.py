@@ -5,7 +5,7 @@ import time
 
 async def main():
     print(f"started at {time.strftime('%X')}")
-    urls = ["https://www.gittigidiyor.com/sac-bakim/sac-bakim-ve-sampuan/sampuan/davines-energizing-dokulme-onleyici-sampuan-250-ml_spp_835744"]
+    urls = ["https://www.gittigidiyor.com/kozmetik-kisisel-bakim/veet-dusta-tuy-dokucu-krem-bacak-vucut-bolgesi-hassas-ciltler-150ml-x-2_pdp_734041920"]
 
     headers = {
         "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36",

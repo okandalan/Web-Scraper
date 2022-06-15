@@ -92,6 +92,10 @@ async def extractDataGG(html):
     if (productOfferedPrice == "\n"):
         productOfferedPrice = productOriginalPrice
         productOriginalPrice = "-"
+    else:
+        # Get value with correct floating point format
+        productOfferedPrice = re.search(r"([0-9]*[.])?[0-9]+", productOfferedPrice\
+        .replace(".", "").replace(",", ".")).group()
 
     productImageContainer = productDetail.find(id="gallery")
     
