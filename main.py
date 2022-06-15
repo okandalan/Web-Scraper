@@ -5,7 +5,7 @@ import time
 
 async def main():
     print(f"started at {time.strftime('%X')}")
-    urls = ["https://www.gittigidiyor.com/giyim-aksesuar/fast-step-unisex-sneaker-ayakkabi-930xaf044_pdp_784061090"]
+    urls = ["https://www.gittigidiyor.com/sac-bakim/sac-bakim-ve-sampuan/sampuan/davines-energizing-dokulme-onleyici-sampuan-250-ml_spp_835744"]
 
     headers = {
         "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36",
@@ -18,7 +18,7 @@ async def main():
     tasks = []
     async with aiohttp.ClientSession(headers=headers) as session:
         for url in urls:
-            tasks.append(scraper.fetchData(session, url))
+            tasks.append(scraper.fetchData(session, url, "gg"))
 
         data = await asyncio.gather(*tasks)
         print(data)

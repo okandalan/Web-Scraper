@@ -1,4 +1,4 @@
-from itertools import product
+import re
 from bs4 import BeautifulSoup
 import logging
 import cchardet
@@ -15,14 +15,17 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 
-async def fetchData(session, url):
+async def fetchData(session, url, retailer):
     try:
         async with session.get(url) as response:
             html = await response.text()
     except Exception as e:
         logging.warning("Exception occured", exc_info=True)
     else:
-        return await extractDataGG(html)
+        if (retailer == "hepsi"):
+            return await extractDataHepsi(html)
+        if (retailer == "gg"):
+            return await extractDataGG(html)
 
 
 async def extractDataHepsi(html):
@@ -35,13 +38,20 @@ async def extractDataHepsi(html):
     productTitle = productData.find("h1", itemprop = "name").text.strip()
 
     productPriceAndRatings = productData.find("div", class_ = "product-price-and-ratings")
-    productOriginalPrice = productPriceAndRatings.find(id="originalPrice").text    # change , with . and strip whitespaces + TL
+
+    # Get value with correct floating point format
+    productOriginalPrice = re.search(r"([0-9]*[.])?[0-9]+", productPriceAndRatings.find(id="originalPrice")\
+    .text.replace(".", "").replace(",", ".")).group()   
     productOfferedPrice = productPriceAndRatings.find(id="offering-price")["content"]
 
-    productRatingsContainer = productPriceAndRatings.find("span", class_="ratings evaluate")
-    productRating = productRatingsContainer.find("span", itemprop="ratingValue")["content"] # change , with .
-    productReviewCount = productRatingsContainer.find("span", itemprop="reviewCount")["content"]
+    # Check discount. If it is not exist, assign price without discount to '-'
+    if (productOriginalPrice == productOfferedPrice):
+        productOriginalPrice = "-"
 
+    productRatingsContainer = productPriceAndRatings.find("span", class_="ratings evaluate")
+    productRating = productRatingsContainer.find("span", itemprop="ratingValue")["content"].replace(",", ".")
+    productReviewCount = productRatingsContainer.find("span", itemprop="reviewCount")["content"]
+    
     productImageContainer = productDetail.find(id="productDetailsCarousel")
 
     productMainImg = productImageContainer.find("a")
@@ -49,8 +59,9 @@ async def extractDataHepsi(html):
 
     productImgs = productMainImg.find_next_siblings("a")
     productImgUrls = []
-    for img in productImgs:
-        productImgUrls.append(img.find("img")["data-src"])
+    if productImgs is not None:
+        for img in productImgs:
+            productImgUrls.append(img.find("img")["data-src"])
 
     return {"Title": productTitle, "Price": productOfferedPrice, 
             "Price Without Discount": productOriginalPrice,
@@ -71,8 +82,16 @@ async def extractDataGG(html):
     productReviewCount = productTitleRatingContainer.find(id="sp-reviewCommentCount").text
 
     productPriceContainer = productDetail.find(id="sp-price-container")
-    productOriginalPrice = productPriceContainer.find(id="sp-price-highPrice").text.strip()
-    productOfferedPrice = productPriceContainer.find(id="sp-price-lowPrice") # olmama durumuna bakılacak
+    # Get value with correct floating point format
+    productOriginalPrice = re.search(r"([0-9]*[.])?[0-9]+", productPriceContainer.find(id="sp-price-highPrice")\
+    .text.replace(".", "").replace(",", ".")).group() 
+    productOfferedPrice = productPriceContainer.find(id="sp-price-lowPrice").text # olmama durumuna bakılacak
+
+    # If there is no discount lower price div holds '\n', so check for it
+    # Check discount. If it is not exist, assign price without discount to '-'
+    if (productOfferedPrice == "\n"):
+        productOfferedPrice = productOriginalPrice
+        productOriginalPrice = "-"
 
     productImageContainer = productDetail.find(id="gallery")
     
@@ -83,7 +102,7 @@ async def extractDataGG(html):
     productImgs = productImgsUl.find_all("img")
     productImgUrls = []
     for img in productImgs:
-        productImgUrls.append(img["data-zoom-image"])    
+        productImgUrls.append(img["swapimg"])    
 
     return {"Title": productTitle, "Price": productOfferedPrice, 
             "Price Without Discount": productOriginalPrice,
