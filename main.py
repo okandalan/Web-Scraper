@@ -12,7 +12,8 @@ import export
 
 async def main():
     print(f"started at {time.strftime('%X')}")
-    urls = ["https://okandalan.github.io/15", "https://www.hepsiburada.com/dreame-v10-pro-dikey-kablosuz-sarjli-supurge-genpa-garantili-p-HBV0000188N7U"]
+    urls = ["https://okandalan.github.io/15", "https://www.hepsiburada.com/dreame-v10-pro-dikey-kablosuz-sarjli-supurge-genpa-garantili-p-HBV0000188N7U",
+            "https://www.hepsiburada.com/fantom-p-1200-pratic-kirmizi-kuru-supurge-p-evfanprap1200"]
 
     headers = {
         "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36",
@@ -29,18 +30,22 @@ async def main():
                 task = scraper.fetchData(session, url, "hepsi")
                 tasks.append(task)
         
+        # return_exceptions=True append raised Exceptions to data so they can be catched
         data = await asyncio.gather(*tasks, return_exceptions=True)
         
 
     for i in data:
         try:
+            # Catched Exceptions in the data
             if (isinstance(i, Exception)):
                 raise i
         except Exception as e:
             logger.exception(f"Error: {str(e)}")
 
     print(data)
-    export.exportToJson(data)
+    export.exportToCsv(data)
+    export.exportToExcel(data)
+
     print(f"finished at {time.strftime('%X')}")
 
 if __name__ == "__main__":
