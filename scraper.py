@@ -2,10 +2,13 @@ import re
 from bs4 import BeautifulSoup
 import logging
 import cchardet
+import aiohttp
+import exceptions
+
 
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
 
@@ -16,16 +19,24 @@ logger.addHandler(file_handler)
 
 
 async def fetchData(session, url, retailer):
-    try:
-        async with session.get(url) as response:
+    
+    async with session.get(url) as response:
+        
+        if (response.status == 200):
+            logger.info(f"Successful request status code: {response.status}")
+
             html = await response.text()
-    except Exception as e:
-        logging.warning("Exception occured", exc_info=True)
-    else:
-        if (retailer == "hepsi"):
-            return await extractDataHepsi(html)
-        if (retailer == "gg"):
-            return await extractDataGG(html)
+            if (retailer == "hepsi"):
+                return await extractDataHepsi(html)
+            if (retailer == "gg"):
+                return await extractDataGG(html)            
+
+        elif (response.status == 204):
+            logger.info(f"There is no content status code: {response.status}")
+        elif (response.status >= 400):
+            logger.error(f"Bad request status code: {response.status}")
+            raise exceptions.FailedRequest("Request failed")
+
 
 
 async def extractDataHepsi(html):
@@ -85,7 +96,7 @@ async def extractDataGG(html):
     # Get value with correct floating point format
     productOriginalPrice = re.search(r"([0-9]*[.])?[0-9]+", productPriceContainer.find(id="sp-price-highPrice")\
     .text.replace(".", "").replace(",", ".")).group() 
-    productOfferedPrice = productPriceContainer.find(id="sp-price-lowPrice").text # olmama durumuna bakılacak
+    productOfferedPrice = productPriceContainer.find(id="sp-price-lowPrice").text 
 
     # If there is no discount lower price div holds '\n', so check for it
     # Check discount. If it is not exist, assign price without discount to '-'
@@ -102,7 +113,7 @@ async def extractDataGG(html):
     productMainImg = productImageContainer.find(id="big-photo")
     productMainUrl = productMainImg["src"]
 
-    productImgsUl = productImageContainer.find("ul", class_="product-photos-ul") # normalde ul den sonra boşluk var ama çalışmıyor öyle
+    productImgsUl = productImageContainer.find("ul", class_="product-photos-ul") 
     productImgs = productImgsUl.find_all("img")
     productImgUrls = []
     for img in productImgs:

@@ -1,11 +1,18 @@
+from asyncio import exceptions
+from asyncio.log import logger
+import time
 import asyncio
 import aiohttp
+import logging
+import exceptions
 import scraper
-import time
+import export
+
+
 
 async def main():
     print(f"started at {time.strftime('%X')}")
-    urls = ["https://www.gittigidiyor.com/kozmetik-kisisel-bakim/veet-dusta-tuy-dokucu-krem-bacak-vucut-bolgesi-hassas-ciltler-150ml-x-2_pdp_734041920"]
+    urls = ["https://okandalan.github.io/15", "https://www.hepsiburada.com/dreame-v10-pro-dikey-kablosuz-sarjli-supurge-genpa-garantili-p-HBV0000188N7U"]
 
     headers = {
         "User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.0.0 Safari/537.36",
@@ -16,12 +23,25 @@ async def main():
         "country-code": "Turkey"
     }
     tasks = []
-    async with aiohttp.ClientSession(headers=headers) as session:
+    timeout = aiohttp.ClientTimeout(total=60)
+    async with aiohttp.ClientSession(headers=headers, timeout=timeout) as session:
         for url in urls:
-            tasks.append(scraper.fetchData(session, url, "gg"))
+                task = scraper.fetchData(session, url, "hepsi")
+                tasks.append(task)
+        
+        data = await asyncio.gather(*tasks, return_exceptions=True)
+        
 
-        data = await asyncio.gather(*tasks)
-        print(data)
+    for i in data:
+        try:
+            if (isinstance(i, Exception)):
+                raise i
+        except Exception as e:
+            logger.exception(f"Error: {str(e)}")
+
+    print(data)
+    export.exportToJson(data)
     print(f"finished at {time.strftime('%X')}")
+
 if __name__ == "__main__":
     asyncio.run(main())
