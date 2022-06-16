@@ -1,7 +1,6 @@
 import csv
 from typing import List
 from xlsxwriter import Workbook
-import json
 
 """ def exportToJson(products):
     with open("products.json", "w") as fout:

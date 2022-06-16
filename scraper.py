@@ -26,9 +26,9 @@ async def fetchData(session, url, retailer):
             logger.info(f"Successful request status code: {response.status}")
 
             html = await response.text()
-            if (retailer == "hepsi"):
+            if (retailer == "hepsibuarada"):
                 return await extractDataHepsi(html)
-            if (retailer == "gg"):
+            if (retailer == "gittigidiyor"):
                 return await extractDataGG(html)            
 
         elif (response.status == 204):

@@ -24,11 +24,16 @@ async def main():
         "country-code": "Turkey"
     }
     tasks = []
+    
     timeout = aiohttp.ClientTimeout(total=60)
     async with aiohttp.ClientSession(headers=headers, timeout=timeout) as session:
         for url in urls:
-                task = scraper.fetchData(session, url, "hepsi")
-                tasks.append(task)
+            if "hepsiburada" in url:
+                retailer = "hepsiburada"
+            elif "gittigidiyor" in url:
+                retailer = "gittigidiyor"
+            task = scraper.fetchData(session, url, retailer)
+            tasks.append(task)
         
         # return_exceptions=True append raised Exceptions to data so they can be catched
         data = await asyncio.gather(*tasks, return_exceptions=True)
