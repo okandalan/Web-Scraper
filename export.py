@@ -2,7 +2,7 @@ import csv
 import os
 from xlsxwriter import Workbook
 
-
+# Destination folder path for exported files
 path = os.path.dirname(os.path.abspath(__file__))
 path = os.path.join(path, "exported_files")
 
