@@ -7,7 +7,7 @@ Hepsiburada, Gittigidiyo
 ## Supported formats:
 csv, Xlsx(Excel)
 
-How to install requirements:
+## How to install requirements:
 `pip install -r requirements.txt`
 
 ## Usage:
