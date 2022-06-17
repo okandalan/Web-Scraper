@@ -13,7 +13,7 @@ Xlsx(Excel)
 `pip install -r requirements.txt`
 
 ## Usage:
-Scraper takes format and urls of products pages as input. You should put your input urls in file. There should be one url for each line and put your input file in same folder as other *.py files. 
+Scraper takes format and urls of products pages as input. You should put your input urls in file. There should be one url for each line and put your input file in same folder as other *.py files. <br />
 Input file example:
 ```
 url1
