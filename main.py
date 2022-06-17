@@ -27,10 +27,18 @@ logger.addHandler(fileHandler)
 logger.addHandler(streamHandler) 
 
 
-async def main(formats):
+async def main(formats, fileName = None):
     print(f"started at {time.strftime('%X')}")
-    urls = ["https://www.hepsiburada.com/fantom-p-1200-pratic-kirmizi-kuru-supurge-p-evfanprap1200",
-            "https://www.gittigidiyor.com/sac-bakim/sac-bakim-ve-sampuan/sampuan/davines-energizing-dokulme-onleyici-sampuan-250-ml_spp_835744"]
+
+    urls = []
+    # Reading url inputs into url
+    if (fileName):
+        with open(fileName) as file:
+            for line in file:
+                line = line.rstrip()
+                if (line == ""):
+                    continue
+                urls.append(line)
 
     # Ordering HTTP headers to prevent getting blocked
     ordHeaders = OrderedDict([ 
@@ -93,22 +101,24 @@ async def main(formats):
 
 if __name__ == "__main__":
     # Command line arguments error handling
-    if (not (2 <= len(sys.argv) <= 3)):
+    if (not (3 <= len(sys.argv) <= 4)):
         raise exceptions.WrongNumberOfArguments()
 
     formats = []
-    if (len(sys.argv) == 3):
+    if (len(sys.argv[:-1]) == 3):
         if ("excel" in sys.argv and "csv" in sys.argv):
             formats.append("excel")
             formats.append("csv")
         else:
             raise exceptions.InvalidArguments()
-    if (len(sys.argv) == 2):
-        if ("excel" in sys.argv):
+    if (len(sys.argv[:-1]) == 2):
+        if ("excel" in sys.argv[:-1]):
             formats.append("excel")
-        elif ("csv" in sys.argv):
+        elif ("csv" in sys.argv[:-1]):
             formats.append("csv")
         else:
             raise exceptions.InvalidArguments()
 
-    asyncio.run(main(formats))
+    fileName = sys.argv[-1]
+
+    asyncio.run(main(formats, fileName))
