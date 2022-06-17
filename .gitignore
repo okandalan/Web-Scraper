@@ -2,4 +2,3 @@ venv/
 *.log
 products*
 __pycache__/
-url_inputs.txt
