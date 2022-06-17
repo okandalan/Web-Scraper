@@ -2,53 +2,52 @@ import re
 from bs4 import BeautifulSoup
 import logging
 import cchardet
-import aiohttp
 import exceptions
-
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
 
-file_handler = logging.FileHandler("scraper.log")
-file_handler.setFormatter(formatter)
+fileHandler = logging.FileHandler("scraper.log")
+fileHandler.setLevel(logging.INFO)
+fileHandler.setFormatter(formatter)
 
-logger.addHandler(file_handler)
+streamHandler = logging.StreamHandler()
+streamHandler.setFormatter(formatter)
+streamHandler.setLevel(logging.INFO)
 
+logger.addHandler(fileHandler)
+logger.addHandler(streamHandler) 
 
 async def fetchData(session, url, retailer):
-    
-    async with session.get(url) as response:
-        
+    async with session.get(url) as response:    
         if (response.status == 200):
-            logger.info(f"Successful request status code: {response.status}")
+            logger.info(f"Successful request, url: {url} status code: {response.status}")
 
             html = await response.text()
-            if (retailer == "hepsibuarada"):
+            if (retailer == "hepsiburada"):
                 return await extractDataHepsi(html)
             if (retailer == "gittigidiyor"):
                 return await extractDataGG(html)            
 
         elif (response.status == 204):
-            logger.info(f"There is no content status code: {response.status}")
+            logger.info(f"There is no content, url: {url} status code: {response.status}")
+            raise exceptions.NoContent(f"There is no content, url: {url} status code: {response.status}")
         elif (response.status >= 400):
-            logger.error(f"Bad request status code: {response.status}")
-            raise exceptions.FailedRequest("Request failed")
-
+            raise exceptions.FailedRequest(f"Request failed, url: {url} status code: {response.status}")
 
 
 async def extractDataHepsi(html):
     soup = BeautifulSoup(html, "lxml")
 
-    productDetail = soup.find("div", class_ = "productDetailContent")
+    productDetail = soup.find("div", class_="productDetailContent")
 
-    productData = productDetail.find("div", class_ = "product-information col lg-5 sm-1")
+    productData = productDetail.find("div", class_="product-information col lg-5 sm-1")
 
-    productTitle = productData.find("h1", itemprop = "name").text.strip()
+    productTitle = productData.find("h1", itemprop="name").text.strip()
 
-    productPriceAndRatings = productData.find("div", class_ = "product-price-and-ratings")
+    productPriceAndRatings = productData.find("div", class_="product-price-and-ratings")
 
     # Get value with correct floating point format
     productOriginalPrice = re.search(r"([0-9]*[.])?[0-9]+", productPriceAndRatings.find(id="originalPrice")\
@@ -76,8 +75,8 @@ async def extractDataHepsi(html):
 
     return {"Title": productTitle, "Price": productOfferedPrice, 
             "Price Without Discount": productOriginalPrice,
-            "Main Image": productMainUrl, "Images": productImgUrls, "Rating Score": productRating,
-            "Review Count": productReviewCount}
+            "Main Image": productMainUrl, "Images": productImgUrls, 
+            "Rating Score": productRating, "Review Count": productReviewCount}
 
 
 async def extractDataGG(html):
@@ -121,6 +120,6 @@ async def extractDataGG(html):
 
     return {"Title": productTitle, "Price": productOfferedPrice, 
             "Price Without Discount": productOriginalPrice,
-            "Main Image": productMainUrl, "Images": productImgUrls, "Rating Score": productRating,
-            "Review Count": productReviewCount}
+            "Main Image": productMainUrl, "Images": productImgUrls, 
+            "Rating Score": productRating, "Review Count": productReviewCount}
     

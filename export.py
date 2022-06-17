@@ -1,5 +1,4 @@
 import csv
-from typing import List
 from xlsxwriter import Workbook
 
 """ def exportToJson(products):
