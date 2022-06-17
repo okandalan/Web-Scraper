@@ -2,17 +2,17 @@
 Web Scraper scrapes e-commerce websites' products data such as price, price without discount, main image URL, other image URLs, title, rating and review count. Then export them in supported file formats.
 
 ## Supported websites:
-Hepsiburada
-Gittigidiyor
+Hepsiburada__
+Gittigidiyo__
 
 ## Supported formats:
-csv
-Xlsx(Excel)
+csv__
+Xlsx(Excel)__
 
 How to install requirements:
 `pip install -r requirements.txt`
 
-Usage:
+## Usage:
 Scraper takes format and urls of products pages as input. You should put your input urls in file. There should be one url for each line and put your input file in same folder as other *.py files. 
 Input file example:
 ```
