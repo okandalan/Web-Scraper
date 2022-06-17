@@ -3,7 +3,7 @@ Web Scraper scrapes products data of e-commerce websites such as price, price wi
 
 ## Supported websites:
 Hepsiburada <br />
-Gittigidiyo
+Gittigidiyor
 
 ## Supported formats:
 csv <br /> 
