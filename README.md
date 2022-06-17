@@ -24,7 +24,7 @@ Now you can run scraper with this format.`python (or python3) main.py format1 fo
 Examples: <br />
 `python3 main.py excel csv products_urls.txt` <br />
 `python3 main.py csv products_urls.txt` <br />
-`python3 main.py excel  products_urls.txt` <br />
+`python3 main.py excel  products_urls.txt` <br /> <br />
 After program finished, you can see your exported files in exported_files directory and loggings in scraper.log
 
 
