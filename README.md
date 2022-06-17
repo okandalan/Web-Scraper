@@ -20,7 +20,7 @@ url1
 url2
 url3
 ```
-Now you can run scraper with this format.`python (or python3) main.py format1 format2 (if you want you can give only one format) input_file` <br />  <br />
+Now you can run scraper with this format.`python (or python3) main.py format1 format2 (if you want you can give only one format) input_file`. Format arguments should be "excel" or "csv" <br />  <br />
 Examples: <br />
 `python3 main.py excel csv products_urls.txt` <br />
 `python3 main.py csv products_urls.txt` <br />
