@@ -1,12 +1,14 @@
 import csv
+import os
 from xlsxwriter import Workbook
 
-""" def exportToJson(products):
-    with open("products.json", "w") as fout:
-            # skipkeys=True to skip exception objects in products list
-            json.dump(products, fout, skipkeys=True) """
+
+path = os.path.dirname(os.path.abspath(__file__))
+path = os.path.join(path, "exported_files")
 
 def exportToCsv(products):
+    if (not os.path.exists(path)):
+        os.makedirs(path)
     headers = ["Title", "Price", "Price Without Discount", "Main Image",
                "Images", "Rating Score", "Review Count"]
 
@@ -20,6 +22,8 @@ def exportToCsv(products):
                 dictWriter.writerow(product)
 
 def exportToExcel(products):
+    if (not os.path.exists(path)):
+        os.makedirs(path)
     headers = ["Title", "Price", "Price Without Discount", "Main Image",
                "Images", "Rating Score", "Review Count"]
 

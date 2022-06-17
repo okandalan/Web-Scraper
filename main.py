@@ -1,4 +1,3 @@
-import time
 import random
 import sys
 from collections import OrderedDict
@@ -11,7 +10,7 @@ import export
 import user_agents
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter("%(levelname)s :: %(name)s :: %(message)s")
 
@@ -28,8 +27,6 @@ logger.addHandler(streamHandler)
 
 
 async def main(formats, fileName = None):
-    print(f"started at {time.strftime('%X')}")
-
     urls = []
     # Reading url inputs into url
     if (fileName):
@@ -96,8 +93,6 @@ async def main(formats, fileName = None):
         export.exportToExcel(data)
     if ("csv" in formats):
         export.exportToCsv(data)
-
-    print(f"finished at {time.strftime('%X')}")
 
 if __name__ == "__main__":
     # Command line arguments error handling

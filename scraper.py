@@ -5,7 +5,7 @@ import cchardet
 import exceptions
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter("%(levelname)s :: %(name)s :: %(message)s")
 
