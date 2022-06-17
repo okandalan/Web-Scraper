@@ -1,5 +1,5 @@
 # Web-Scraper
-Web Scraper scrapes e-commerce websites' products data such as price, price without discount, main image URL, other image URLs, title, rating and review count. Then export them in supported file formats.
+Web Scraper scrapes products data of e-commerce websites such as price, price without discount, main image URL, URLs of other images, title, rating and review count. Then, export them in supported file formats.
 
 ## Supported websites:
 Hepsiburada <br />
