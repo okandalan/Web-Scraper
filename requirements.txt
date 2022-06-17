@@ -1,0 +1,6 @@
+aiohttp==3.8.1
+asyncio==3.4.3
+beautifulsoup4==4.11.1
+cchardet==2.1.7
+lxml==4.9.0
+XlsxWriter==3.0.3

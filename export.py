@@ -10,20 +10,20 @@ def exportToCsv(products):
     headers = ["Title", "Price", "Price Without Discount", "Main Image",
                "Images", "Rating Score", "Review Count"]
 
-    with open("exported-files/products.csv", "w", encoding="utf-8", newline='') as fout:
+    with open("exported_files/products.csv", "w", encoding="utf-8", newline='') as fout:
         dictWriter = csv.DictWriter(fout, fieldnames=headers)
         dictWriter.writeheader()
 
         for product in products:
             # Exception objects in products list are skipped 
-            if (not isinstance(product, Exception)):
+            if (isinstance(product, dict)):
                 dictWriter.writerow(product)
 
 def exportToExcel(products):
     headers = ["Title", "Price", "Price Without Discount", "Main Image",
                "Images", "Rating Score", "Review Count"]
 
-    wb = Workbook("exported-files/products.xlsx")
+    wb = Workbook("exported_files/products.xlsx")
     ws = wb.add_worksheet()
 
     firstRow = 0
@@ -34,7 +34,7 @@ def exportToExcel(products):
     row = 1
     for product in products:
         # Exception objects in products list are skipped 
-        if (not isinstance(product, Exception)):
+        if (isinstance(product, dict)):
             for _key, _value in product.items():
                 col = headers.index(_key)
                 # Convert list of image urls to string to write into one excel cell

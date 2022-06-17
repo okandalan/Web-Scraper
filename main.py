@@ -1,6 +1,6 @@
-import imp
 import time
 import random
+import sys
 from collections import OrderedDict
 import asyncio
 import aiohttp
@@ -13,7 +13,7 @@ import user_agents
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
+formatter = logging.Formatter("%(levelname)s :: %(name)s :: %(message)s")
 
 fileHandler = logging.FileHandler("scraper.log")
 fileHandler.setFormatter(formatter)
@@ -27,13 +27,12 @@ logger.addHandler(fileHandler)
 logger.addHandler(streamHandler) 
 
 
-async def main():
+async def main(formats):
     print(f"started at {time.strftime('%X')}")
-    urls = ["https://www.hepsiburada.com/dreame-v10-pro-dikey-kablosuz-sarjli-supurge-genpa-garantili-p-HBV0000188N7U",
-            "https://hepsiburada.github.io/",   
-            "https://www.hepsiburada.com/fantom-p-1200-pratic-kirmizi-kuru-supurge-p-evfanprap1200"]
+    urls = ["https://www.hepsiburada.com/fantom-p-1200-pratic-kirmizi-kuru-supurge-p-evfanprap1200",
+            "https://www.gittigidiyor.com/sac-bakim/sac-bakim-ve-sampuan/sampuan/davines-energizing-dokulme-onleyici-sampuan-250-ml_spp_835744"]
 
-    # Order HTTP headers to prevent getting blocked
+    # Ordering HTTP headers to prevent getting blocked
     ordHeaders = OrderedDict([ 
         ("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"),
         ("Accept-Encoding", "gzip, deflate, br"),
@@ -43,49 +42,73 @@ async def main():
         ("User-Agent", "Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0")
     ])
 
+    # Clering log file
     with open('scraper.log', 'w'):
         pass
 
     tasks = []
-    
-    timeout = aiohttp.ClientTimeout(total=60)
+    # Setting timeout value for get request
+    timeout = aiohttp.ClientTimeout(total=10)
     async with aiohttp.ClientSession(headers=ordHeaders, timeout=timeout) as session:
         for url in urls:
             # Rotate user agent to prevent getting blocked
             session.headers["User-Agent"] = random.choice(user_agents.userAgents)
-            
+
             if "hepsiburada" in url:
                 retailer = "hepsiburada"
             elif "gittigidiyor" in url:
                 retailer = "gittigidiyor"
             else:
                 continue
+
             task = scraper.fetchData(session, url, retailer)
             tasks.append(task)
         
         # return_exceptions=True append raised Exceptions to data so they can be catched
         data = await asyncio.gather(*tasks, return_exceptions=True)
         
-    # Catched Exceptions in the data
+    # Catching Exceptions in the data
     for exception in data:
         try:
             if (isinstance(exception, Exception)):
                 raise exception
+        except asyncio.exceptions.TimeoutError:
+            logger.error(f"Get request takes more than timeout value: {timeout.total} seconds", exc_info=True)
         except exceptions.NoContent as e:
             logger.error(str(e), exc_info=True)
         except exceptions.FailedRequest as e:
             logger.error(str(e), exc_info=True)
-        except aiohttp.ServerTimeoutError as e:
-            logger.error(f"Timeout error: {str(e)}", exc_info=True)
         except aiohttp.ClientConnectionError as e:
             logger.error(f"Connection error: {str(e)}", exc_info=True)
         except aiohttp.ClientError as e:
             logger.error(f"Error: {str(e)}", exc_info=True)
 
-    export.exportToCsv(data)
-    export.exportToExcel(data)
+    # Exporting selected formats
+    if ("excel" in formats):
+        export.exportToExcel(data)
+    if ("csv" in formats):
+        export.exportToCsv(data)
 
     print(f"finished at {time.strftime('%X')}")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # Command line arguments error handling
+    if (not (2 <= len(sys.argv) <= 3)):
+        raise exceptions.WrongNumberOfArguments()
+
+    formats = []
+    if (len(sys.argv) == 3):
+        if ("excel" in sys.argv and "csv" in sys.argv):
+            formats.append("excel")
+            formats.append("csv")
+        else:
+            raise exceptions.InvalidArguments()
+    if (len(sys.argv) == 2):
+        if ("excel" in sys.argv):
+            formats.append("excel")
+        elif ("csv" in sys.argv):
+            formats.append("csv")
+        else:
+            raise exceptions.InvalidArguments()
+
+    asyncio.run(main(formats))
